@@ -1,0 +1,23 @@
+{
+  "name": "skynest-project",
+  "version": "1.0.0",
+  "description": "Group 38 Database Project",
+  "main": "index.js",
+  "author": "Dinura N. Ginige",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^3.1.4",
+    "concurrently": "^8.2.0" 
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "backend": "cd backend && npm run dev",
+    "guest-end": "cd guest-end && npm run dev",
+    "admin-end": "cd admin-end && npm run dev",
+    "serviceoffice-end": "cd serviceoffice-end && npm run dev",
+    "frontdeskoffice-end": "cd frontdeskoffice-end && npm run dev",
+    "management-end": "cd management-end && npm run dev",
+    "start": "concurrently \"npm run backend\" \"npm run guest-end\" \"npm run admin-end\" \"npm run management-end\" \"npm run serviceoffice-end\" \"npm run frontdeskoffice-end\"  "
+  }
+}
