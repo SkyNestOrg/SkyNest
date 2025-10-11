@@ -1,2 +1,20 @@
-node_modules
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
 .env
+.env.local
+
+# Database files (if they contain sensitive data)
+database_files/
+# OR if you want to keep database structure but not data:
+# database_files/*.data
+# database_files/*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
