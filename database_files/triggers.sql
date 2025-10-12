@@ -32,25 +32,7 @@ END$$
 DELIMITER ;
 
 
--- Trigger 2/b: Update room status to 'Available' when booked_room status becomes 'Cancelled'
-DELIMITER $$
-
-CREATE TRIGGER after_booked_room_checkedout
-AFTER UPDATE ON booked_room
-FOR EACH ROW
-BEGIN
-    IF NEW.status = 'CheckedOut' AND (OLD.status IS NULL OR OLD.status != 'CheckedOut') THEN
-        UPDATE room 
-        SET current_status = 'Available' 
-        WHERE room_number = NEW.room_number AND branch_id = NEW.branch_id;
-    END IF;
-END$$
-
-DELIMITER ;
-
-
-
---Trigger 3: When booking status = 'Cancelled' Booked_rooms also change to cancelled state.
+-- Trigger 3: When booking status = 'Cancelled' Booked_rooms also change to cancelled state.
 
 DELIMITER //
 
@@ -103,23 +85,6 @@ END;
 
 DELIMITER ;
 
--- Trigger 6: Create Bill when booking status = 'CheckedIn'
-DELIMITER //
-
-CREATE TRIGGER initialize_bill_on_checkin
-AFTER UPDATE ON booking
-FOR EACH ROW
-BEGIN
-    IF NEW.status = 'CheckedIn' AND OLD.status != 'CheckedIn' THEN
-        -- Insert a new bill record when booking is confirmed
-        INSERT INTO Bill (bill_date, booking_id,room_total, service_total,tax_amount,due_amount ,bill_status)
-        VALUES (DATE(NOW()), NEW.booking_id, 0.00,0.00,0.00,0.00, 'Pending');
-    END IF;
-END;
-//
-
-DELIMITER ;
------------------------------------------------
 -- Trigger 6: Create Bill when booking status = 'CheckedIn' - more sophisticated
 DELIMITER //
 
@@ -170,38 +135,66 @@ CREATE TRIGGER update_bill_service_total
 AFTER UPDATE ON service_request
 FOR EACH ROW
 BEGIN
-    DECLARE service_charge DECIMAL(10,2);
-    DECLARE current_service_total DECIMAL(10,2);
-    
-    -- Check if status changed to 'Completed'
-    IF NEW.status = 'Completed' AND OLD.status != 'Completed' THEN
-        
-        -- Calculate the service charge for this completed service
-        SELECT unit_quantity_charges INTO service_charge, booking_id
-        FROM service join on service.service_type  = service_request.request_type
-        join on bill.booking_id = service_request.booking_id
-        WHERE service_type = NEW.request_type 
-        AND branch_id = NEW.branch_id;
-        
-        -- If service charge found, update the bill
-        IF service_charge IS NOT NULL THEN
-            -- Get current service_total from bill
-            SELECT service_total INTO current_service_total
-            FROM bill 
-            WHERE booking_id = NEW.booking_id;
-            
-            -- If bill exists, update it
-            IF current_service_total IS NOT NULL THEN
-                UPDATE bill 
-                SET service_total = service_total + (service_charge * NEW.quantity),
-                    sub_total = room_total + (service_total + (service_charge * NEW.quantity)),
-                    grand_total = sub_total + tax_amount,
-                    
-                WHERE booking_id = NEW.booking_id;
-            END IF;
-        END IF;
-    END IF;
-END//
+     DECLARE service_charge DECIMAL(10,2);
+     DECLARE current_service_total DECIMAL(10,2);
+     DECLARE current_room_total DECIMAL(10,2);
+     DECLARE current_due_amount DECIMAL(10,2);
+     DECLARE tax_percentage DECIMAL(10,2);
+     DECLARE new_service_total DECIMAL(10,2);
+     DECLARE new_tax_amount DECIMAL(10,2);
+     DECLARE service_increase DECIMAL(10,2);
+     DECLARE tax_increase DECIMAL(10,2);
+     DECLARE total_increase DECIMAL(10,2);
+     
+     -- Check if status changed to 'Completed'
+     IF NEW.status = 'Completed' AND OLD.status != 'Completed' THEN
+         
+         -- Calculate the service charge for this completed service
+         SELECT unit_quantity_charges INTO service_charge
+         FROM service 
+         WHERE service_type = NEW.request_type 
+         AND service.branch_id = NEW.branch_id;
+         
+         -- If service charge found, update the bill
+         IF service_charge IS NOT NULL THEN
+             -- Get current values from bill
+             SELECT service_total, room_total, due_amount 
+             INTO current_service_total, current_room_total, current_due_amount
+             FROM bill 
+             WHERE booking_id = NEW.booking_id;
+             
+             -- Get the latest tax percentage
+             SELECT latest_tax_percentage 
+             INTO tax_percentage
+             FROM taxes_and_charges 
+             ORDER BY revision_date DESC 
+             LIMIT 1;
+             
+             -- If tax percentage not found, set default to 0
+             IF tax_percentage IS NULL THEN
+                 SET tax_percentage = 0;
+             END IF;
+             
+             -- Calculate the increase amounts
+             SET service_increase = service_charge * NEW.quantity;
+             SET new_service_total = current_service_total + service_increase;
+             
+             -- Calculate tax increase for the new service amount
+             SET tax_increase = service_increase * tax_percentage / 100;
+             SET new_tax_amount = (current_room_total + new_service_total) * tax_percentage / 100;
+             
+             -- Calculate total amount to add to due_amount
+             SET total_increase = service_increase + tax_increase;
+             
+             -- Update service_total, tax_amount, and due_amount
+             UPDATE bill
+             SET service_total = new_service_total,
+                 tax_amount = new_tax_amount,
+                 due_amount = current_due_amount + total_increase
+             WHERE booking_id = NEW.booking_id;
+         END IF;
+     END IF;
+ END//
 
 DELIMITER ;
 
@@ -223,3 +216,4 @@ END//
 
 DELIMITER ;
 
+-- ----------------------------------------------------------------------------------------------
