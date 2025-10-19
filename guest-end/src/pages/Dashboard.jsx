@@ -188,7 +188,7 @@ function Dashboard() {
       </nav>
 
       <main style={styles.content}>
-        <div>Welcome to SkyNest HRGSMS System 🌴</div>
+        <div>Welcome to SkyNest HRGSMS System </div>
         <div style={{ fontSize: '1rem', marginTop: '1rem', fontWeight: 'normal' }}>
           Guest ID: {user.id}
         </div>
