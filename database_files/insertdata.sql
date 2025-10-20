@@ -64,19 +64,19 @@ INSERT INTO service(service_type, unit_quantity_charges, branch_id, availability
 
 
 -- initial staff-users
-
+-- initial password      =    123qwe for all users  !!!!!!!!!!!!
 
 INSERT INTO staff_user (username, password, official_role, branch_id) VALUES
-('AD001', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'admin-user', 1),
-('FO001', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'frontoffice-user', 1),
-('FO002', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'frontoffice-user', 2),
-('FO003', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'frontoffice-user', 3),
-('MN001', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'management-user', 1),
-('SO001', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'serviceoffice-user', 1),
-('SO002', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'serviceoffice-user', 2),
-('SO003', '$2a$12$wO7zUDW2gFRu34poUSa.q.5T2eqgAOVQxkFik59aSz.kqV9vIL2h.', 'serviceoffice-user', 3);
+('AD001', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'admin-user', 1),
+('FO001', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'frontoffice-user', 1),
+('FO002', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'frontoffice-user', 2),
+('FO003', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'frontoffice-user', 3),
+('MN001', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'management-user', 1),
+('SO001', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'serviceoffice-user', 1),
+('SO002', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'serviceoffice-user', 2),
+('SO003', '$2a$12$FSzBjTcT9VNktXGcHFuVD.II2V75rB33/pprjByOXFC5du90U5lwO', 'serviceoffice-user', 3);
 
--- note that all these hashed passwords =  123456.
+
 
 
 -- Insert Room data
